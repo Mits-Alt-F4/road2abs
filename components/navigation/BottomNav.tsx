@@ -15,8 +15,8 @@ export function BottomNav() {
   const path = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--color-surface)] border-t border-[var(--color-border)] safe-bottom">
-      <div className="flex items-stretch justify-around px-1 pt-1 pb-1" style={{ paddingBottom: 'max(4px, env(safe-area-inset-bottom))' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--color-surface)] border-t border-[var(--color-border)]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="flex items-stretch justify-around px-1 pt-1 pb-1">
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = path === href || (href !== '/today' && path.startsWith(href))
           return (
@@ -25,18 +25,13 @@ export function BottomNav() {
               href={href}
               className={cn(
                 'flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 rounded-[var(--radius-md)] transition-colors min-h-[52px]',
-                active
-                  ? 'text-[var(--color-accent)]'
-                  : 'text-[var(--color-subtle)] hover:text-[var(--color-muted)]'
+                active ? 'text-[var(--color-lime)]' : 'text-[var(--color-subtle)] hover:text-[var(--color-muted)]'
               )}
             >
               <Icon className={cn('w-5 h-5', active && 'stroke-[2.5px]')} />
-              <span className={cn('text-[10px] font-semibold', active ? 'text-[var(--color-accent)]' : 'text-[var(--color-subtle)]')}>
+              <span className={cn('text-[10px] font-semibold', active ? 'text-[var(--color-lime)]' : 'text-[var(--color-subtle)]')}>
                 {label}
               </span>
-              {active && (
-                <span className="absolute bottom-[calc(env(safe-area-inset-bottom)+2px)] w-1 h-1 rounded-full bg-[var(--color-accent)]" />
-              )}
             </Link>
           )
         })}

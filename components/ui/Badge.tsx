@@ -15,10 +15,10 @@ export function Badge({ label, variant = 'stone', size = 'sm', className }: Badg
         size === 'sm' ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1',
         {
           'bg-[var(--color-accent-light)] text-[var(--color-accent-dark)]': variant === 'accent',
-          'bg-emerald-50 text-emerald-700': variant === 'green',
-          'bg-orange-50 text-orange-700': variant === 'orange',
-          'bg-stone-100 text-stone-600': variant === 'stone',
-          'bg-lime-100 text-lime-700': variant === 'lime',
+          'bg-[#0d2a0d] text-[#4ade80]': variant === 'green',
+          'bg-[#2a1200] text-[#fb923c]': variant === 'orange',
+          'bg-[var(--color-surface-raised)] text-[var(--color-muted)]': variant === 'stone',
+          'bg-[#1e2800] text-[var(--color-lime)]': variant === 'lime',
         },
         className
       )}
@@ -45,7 +45,7 @@ export function StoreBadge({ store }: { store: string }) {
     <span
       className={cn(
         'inline-flex items-center rounded-full text-[11px] font-bold px-2 py-0.5',
-        classes[store] ?? 'bg-stone-100 text-stone-600'
+        classes[store] ?? 'bg-[var(--color-surface-raised)] text-[var(--color-muted)]'
       )}
     >
       {labels[store] ?? store}

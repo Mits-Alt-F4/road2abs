@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Base stone palette */
+  /* Base palette */
   --color-stone-50: #fafaf9;
   --color-stone-100: #f5f5f4;
   --color-stone-200: #e7e5e4;
@@ -26,24 +26,29 @@
   --color-forest-800: #21381e;
   --color-forest-900: #152413;
 
-  /* Positive / progress accents */
-  --color-lime-400: #a3e635;
-  --color-lime-500: #84cc16;
-  --color-lime-600: #65a30d;
+  /* Lime — from R2A road logo */
+  --color-lime-300: #d9f066;
+  --color-lime-400: #c5d94a;
+  --color-lime-500: #a8be30;
+  --color-lime-600: #8aa020;
+
   --color-amber-400: #fbbf24;
   --color-amber-500: #f59e0b;
 
-  /* Semantic app tokens */
-  --color-bg: #f7f6f3;
-  --color-surface: #ffffff;
-  --color-border: #e5e3df;
-  --color-text: #1c1917;
-  --color-muted: #78716c;
-  --color-subtle: #a8a29e;
+  /* Semantic dark tokens */
+  --color-bg: #0e0e0e;
+  --color-surface: #171717;
+  --color-surface-raised: #202020;
+  --color-border: #272727;
+  --color-border-strong: #353535;
+  --color-text: #edece8;
+  --color-muted: #7a7875;
+  --color-subtle: #474441;
   --color-accent: #3a6235;
-  --color-accent-light: #d9e7d7;
-  --color-accent-dark: #2d4d29;
-  --color-positive: #a3e635;
+  --color-accent-light: #1c2e1a;
+  --color-accent-dark: #4d8046;
+  --color-lime: #c5d94a;
+  --color-positive: #c5d94a;
   --color-warn: #f59e0b;
   --color-danger: #ef4444;
 
@@ -60,9 +65,8 @@
   --radius-xl: 20px;
   --radius-2xl: 24px;
 
-  /* Font stack — Geist when available, falls back gracefully */
-  --font-sans: 'Inter', 'Geist', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
 }
 
 * {
@@ -85,11 +89,9 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* iPhone notch / home indicator safe areas */
 .safe-top    { padding-top: env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
-/* Remove number input spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -97,11 +99,9 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 input[type="number"] { -moz-appearance: textfield; }
 
-/* Pressed state */
 button:active { transform: scale(0.97); }
 
-/* Store badge utility classes */
-.store-badge-coop   { background: #fff1f1; color: #c01016; border: 1px solid #fecaca; }
-.store-badge-migros { background: #fff4ee; color: #c04300; border: 1px solid #fed7aa; }
-.store-badge-lidl   { background: #eff6ff; color: #1a5fc2; border: 1px solid #bfdbfe; }
-.store-badge-denner { background: #fff1f1; color: #a00000; border: 1px solid #fecaca; }
+.store-badge-coop   { background: #2a0a0a; color: #f87171; border: 1px solid #7f1d1d; }
+.store-badge-migros { background: #2a1200; color: #fb923c; border: 1px solid #7c2d12; }
+.store-badge-lidl   { background: #0a1a2a; color: #60a5fa; border: 1px solid #1e3a5f; }
+.store-badge-denner { background: #2a0000; color: #f87171; border: 1px solid #7f1d1d; }

@@ -1,21 +1,18 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChipGroup } from '@/components/ui/Chip'
-import { Card } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { ProgressBar } from '@/components/ui/ProgressBar'
 import { formatDate, greeting, chf } from '@/lib/utils/format'
 import type { NutritionTargets, MealContext, MealTime, Store, TimeFilter } from '@/types'
 
-const SITUATIONS: { value: MealContext; label: string; icon: string }[] = [
-  { value: 'meal', label: 'Meal', icon: '🍽️' },
-  { value: 'snack', label: 'Snack', icon: '⚡' },
-  { value: 'sweet', label: 'Sweet', icon: '🍫' },
-  { value: 'no_cooking', label: 'No cooking', icon: '🥶' },
-  { value: 'emergency_protein', label: 'Emergency protein', icon: '🆘' },
-  { value: 'meal_prep', label: 'Meal prep', icon: '📦' },
+const SITUATIONS: { value: MealContext; label: string }[] = [
+  { value: 'meal', label: 'Full meal' },
+  { value: 'snack', label: 'Snack' },
+  { value: 'sweet', label: 'Something sweet' },
+  { value: 'no_cooking', label: 'No cooking' },
+  { value: 'emergency_protein', label: 'Max protein' },
+  { value: 'meal_prep', label: 'Meal prep' },
 ]
 
 const MEAL_TIMES: { value: MealTime; label: string }[] = [
@@ -26,19 +23,19 @@ const MEAL_TIMES: { value: MealTime; label: string }[] = [
   { value: 'post_gym', label: 'Post gym' },
 ]
 
-const STORES: { value: Store | 'any_nearby'; label: string; color: string }[] = [
-  { value: 'coop', label: 'Coop', color: '#e31e26' },
-  { value: 'migros', label: 'Migros', color: '#ff6600' },
-  { value: 'any_nearby', label: 'Either nearby', color: '#3a6235' },
-  { value: 'lidl', label: 'Lidl', color: '#0050aa' },
-  { value: 'denner', label: 'Denner', color: '#cc0000' },
+const STORES: { value: Store | 'any_nearby'; label: string; color: string; textColor: string }[] = [
+  { value: 'any_nearby', label: 'Any nearby', color: '#1c2e1a', textColor: '#4d8046' },
+  { value: 'coop', label: 'Coop', color: '#3d0a0a', textColor: '#f87171' },
+  { value: 'migros', label: 'Migros', color: '#2a1200', textColor: '#fb923c' },
+  { value: 'lidl', label: 'Lidl', color: '#0a1a2e', textColor: '#60a5fa' },
+  { value: 'denner', label: 'Denner', color: '#2a0505', textColor: '#f87171' },
 ]
 
 const TIME_FILTERS: { value: TimeFilter; label: string }[] = [
   { value: 'none', label: 'No cooking' },
   { value: 'under_10', label: '< 10 min' },
   { value: 'under_20', label: '< 20 min' },
-  { value: 'any', label: 'Any time' },
+  { value: 'any', label: 'Any' },
 ]
 
 interface Props {
@@ -95,206 +92,163 @@ export function TodayClient({ targets, recentRecipes }: Props) {
   return (
     <div className="flex flex-col min-h-dvh bg-[var(--color-bg)]">
       {/* Header */}
-      <header className="safe-top bg-[var(--color-bg)] sticky top-0 z-30 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-2xl font-black tracking-tight text-[var(--color-text)]">
-            road<span className="text-[var(--color-accent)]">2</span>abs
-          </h1>
-          <a href="/more/settings" className="w-9 h-9 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-sm font-bold text-[var(--color-muted)]">
-            ⚙
-          </a>
-        </div>
+      <header className="safe-top bg-[var(--color-bg)] sticky top-0 z-30 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] border-b border-[var(--color-border)]">
         <div className="flex items-center justify-between">
-          <p className="text-[var(--color-subtle)] text-sm font-medium">{formatDate()}</p>
-          <p className="text-[var(--color-muted)] text-sm font-semibold">{greeting()}</p>
+          <h1 className="text-2xl font-black tracking-tight text-[var(--color-text)]">
+            road<span className="text-[var(--color-lime)]">2</span>abs
+          </h1>
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-[var(--color-muted)] font-medium">{formatDate()}</span>
+            <span className="text-xs text-[var(--color-subtle)]">{greeting()}</span>
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 px-4 pb-6 flex flex-col gap-4">
+      <div className="flex-1 px-4 pb-6 flex flex-col gap-5 pt-5">
 
-        {/* Daily targets card */}
-        <Card padding="md">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wide">Daily targets</h2>
-            <a href="/more/settings" className="text-xs text-[var(--color-accent)] font-semibold">Edit</a>
-          </div>
-          <div className="flex gap-6 mb-3">
-            <div>
-              <div className="text-2xl font-black tabular-nums text-[var(--color-text)]">
-                {targets.calories.toLocaleString()}
-              </div>
-              <div className="text-xs text-[var(--color-subtle)] font-medium uppercase tracking-wide">kcal / day</div>
-            </div>
-            <div className="w-px bg-[var(--color-border)]" />
-            <div>
-              <div className="text-2xl font-black tabular-nums text-[var(--color-accent)]">
-                {targets.protein_target}g
-              </div>
-              <div className="text-xs text-[var(--color-subtle)] font-medium uppercase tracking-wide">
-                protein target
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2 text-xs text-[var(--color-subtle)] font-medium">
-            <span>Min {targets.protein_min}g</span>
-            <span>·</span>
-            <span>Target {targets.protein_target}g</span>
-            <span>·</span>
-            <span>Upper {targets.protein_max}g</span>
-          </div>
-          {mode === 'consumed' && calNum > 0 && (
-            <div className="mt-3">
-              <ProgressBar value={calNum} max={targets.calories} variant={calPct > 90 ? 'warn' : 'accent'} />
-              <div className="text-xs text-[var(--color-subtle)] mt-1">{Math.round(calPct)}% of daily calories consumed</div>
-            </div>
-          )}
-        </Card>
-
-        {/* Input mode toggle */}
-        <div className="flex rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-border)] p-1">
+        {/* Mode toggle */}
+        <div className="flex rounded-[var(--radius-lg)] bg-[var(--color-surface)] border border-[var(--color-border)] p-1 gap-1">
           {(['remaining', 'consumed'] as const).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 py-2.5 text-sm font-semibold rounded-[var(--radius-sm)] transition-all ${
+              className={`flex-1 py-2.5 text-sm font-bold rounded-[var(--radius-md)] transition-all ${
                 mode === m
-                  ? 'bg-[var(--color-accent)] text-white shadow-sm'
+                  ? 'bg-[var(--color-lime)] text-[#0e0e0e]'
                   : 'text-[var(--color-muted)]'
               }`}
             >
-              {m === 'remaining' ? 'I have left…' : 'I have eaten…'}
+              {m === 'remaining' ? 'I have left' : 'I have eaten'}
             </button>
           ))}
         </div>
 
-        {/* Macro inputs */}
-        <Card padding="md">
-          <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wide mb-3">
-            {mode === 'remaining' ? 'What I have left today' : 'What I have eaten today'}
-          </h2>
-          <div className="flex gap-3 mb-3">
-            <div className="flex-1">
-              <Input
-                label="Calories"
+        {/* Macro inputs — big and prominent */}
+        <div>
+          <p className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-widest mb-3">
+            {mode === 'remaining' ? 'What you have left today' : 'What you have eaten today'}
+          </p>
+          <div className="flex gap-3 mb-2">
+            <div className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-muted)] mb-1">Calories</div>
+              <input
                 type="number"
                 inputMode="numeric"
                 placeholder={mode === 'remaining' ? '500' : '1500'}
-                unit="kcal"
                 value={calories}
                 onChange={(e) => setCalories(e.target.value)}
+                className="w-full bg-transparent text-3xl font-black text-[var(--color-text)] placeholder:text-[var(--color-subtle)] focus:outline-none tabular-nums"
               />
+              <div className="text-xs text-[var(--color-subtle)] mt-1">kcal</div>
             </div>
-            <div className="flex-1">
-              <Input
-                label="Protein"
+            <div className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-muted)] mb-1">Protein</div>
+              <input
                 type="number"
                 inputMode="decimal"
                 placeholder={mode === 'remaining' ? '60' : '90'}
-                unit="g"
                 value={protein}
                 onChange={(e) => setProtein(e.target.value)}
+                className="w-full bg-transparent text-3xl font-black text-[var(--color-lime)] placeholder:text-[var(--color-subtle)] focus:outline-none tabular-nums"
               />
+              <div className="text-xs text-[var(--color-subtle)] mt-1">grams</div>
             </div>
           </div>
 
           {remCal > 0 && remPro > 0 && (
-            <div className="bg-[var(--color-accent-light)] rounded-[var(--radius-md)] px-3 py-2 mb-3 flex gap-4 text-sm">
-              <span className="font-semibold text-[var(--color-accent-dark)]">
-                {Math.round(remCal)} kcal remaining
-              </span>
-              <span className="text-[var(--color-accent)]">·</span>
-              <span className="font-semibold text-[var(--color-accent-dark)]">
-                {Math.round(remPro)}g protein needed
-              </span>
+            <div className="bg-[var(--color-accent-light)] border border-[var(--color-accent)] border-opacity-30 rounded-[var(--radius-lg)] px-4 py-2.5 flex gap-4 text-sm">
+              <span className="font-bold text-[var(--color-text)]">{Math.round(remCal)} kcal</span>
+              <span className="text-[var(--color-subtle)]">·</span>
+              <span className="font-bold text-[var(--color-lime)]">{Math.round(remPro)}g protein needed</span>
+            </div>
+          )}
+
+          {mode === 'consumed' && calNum > 0 && (
+            <div className="mt-2">
+              <div className="h-1.5 rounded-full bg-[var(--color-border)] overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${Math.min(100, calPct)}%`,
+                    backgroundColor: calPct > 90 ? 'var(--color-warn)' : 'var(--color-lime)',
+                  }}
+                />
+              </div>
+              <div className="text-xs text-[var(--color-subtle)] mt-1">{Math.round(calPct)}% of {targets.calories} kcal target</div>
             </div>
           )}
 
           <button
             type="button"
             onClick={() => setShowOptional(!showOptional)}
-            className="text-xs text-[var(--color-accent)] font-semibold flex items-center gap-1"
+            className="text-xs text-[var(--color-muted)] font-semibold mt-2 flex items-center gap-1"
           >
-            {showOptional ? '− Hide' : '+ Add'} carbs &amp; fat
+            {showOptional ? '− Hide' : '+'} carbs & fat
           </button>
 
           {showOptional && (
             <div className="flex gap-3 mt-3">
               <div className="flex-1">
-                <Input
-                  label="Carbs"
-                  type="number"
-                  inputMode="decimal"
-                  placeholder="g"
-                  unit="g"
-                  value={carbs}
-                  onChange={(e) => setCarbs(e.target.value)}
-                />
+                <Input label="Carbs" type="number" inputMode="decimal" placeholder="g" unit="g" value={carbs} onChange={(e) => setCarbs(e.target.value)} />
               </div>
               <div className="flex-1">
-                <Input
-                  label="Fat"
-                  type="number"
-                  inputMode="decimal"
-                  placeholder="g"
-                  unit="g"
-                  value={fat}
-                  onChange={(e) => setFat(e.target.value)}
-                />
+                <Input label="Fat" type="number" inputMode="decimal" placeholder="g" unit="g" value={fat} onChange={(e) => setFat(e.target.value)} />
               </div>
             </div>
           )}
-        </Card>
+        </div>
 
-        {/* Situation chips */}
-        <Card padding="md">
-          <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wide mb-3">What are you after?</h2>
+        {/* What are you after */}
+        <div>
+          <p className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-widest mb-3">What are you after?</p>
           <div className="flex flex-wrap gap-2">
             {SITUATIONS.map((s) => (
               <button
                 key={s.value}
                 onClick={() => setSituation(situation === s.value ? null : s.value)}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
                   situation === s.value
-                    ? 'bg-[var(--color-accent)] text-white shadow-sm'
-                    : 'bg-stone-100 text-[var(--color-muted)] hover:bg-[var(--color-accent-light)] hover:text-[var(--color-accent-dark)]'
+                    ? 'bg-[var(--color-lime)] text-[#0e0e0e] border-[var(--color-lime)]'
+                    : 'bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)] hover:border-[var(--color-border-strong)]'
                 }`}
               >
-                <span>{s.icon}</span>
                 {s.label}
               </button>
             ))}
           </div>
-        </Card>
+        </div>
 
-        {/* Meal time chips */}
-        <Card padding="md">
-          <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wide mb-3">Meal time <span className="text-[var(--color-subtle)] normal-case font-normal">(optional)</span></h2>
+        {/* Meal time */}
+        <div>
+          <p className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-widest mb-3">
+            Meal time <span className="normal-case font-normal">(optional)</span>
+          </p>
           <div className="flex flex-wrap gap-2">
             {MEAL_TIMES.map((m) => (
               <button
                 key={m.value}
                 onClick={() => setMealTime(mealTime === m.value ? null : m.value)}
-                className={`px-3.5 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
                   mealTime === m.value
-                    ? 'bg-stone-800 text-white'
-                    : 'bg-stone-100 text-[var(--color-muted)] hover:bg-stone-200'
+                    ? 'bg-[var(--color-surface-raised)] text-[var(--color-text)] border-[var(--color-border-strong)]'
+                    : 'bg-[var(--color-surface)] text-[var(--color-muted)] border-[var(--color-border)]'
                 }`}
               >
                 {m.label}
               </button>
             ))}
           </div>
-        </Card>
+        </div>
 
-        {/* Store selection */}
-        <Card padding="md">
+        {/* Store */}
+        <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wide">Store</h2>
+            <p className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-widest">Store</p>
             <div className="flex items-center gap-2">
               <span className="text-xs text-[var(--color-subtle)]">Nearby only</span>
               <button
                 onClick={() => setNearbyOnly(!nearbyOnly)}
-                className={`w-9 h-5 rounded-full transition-colors ${nearbyOnly ? 'bg-[var(--color-accent)]' : 'bg-stone-200'} relative`}
+                className={`w-9 h-5 rounded-full transition-colors relative ${nearbyOnly ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border-strong)]'}`}
               >
                 <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${nearbyOnly ? 'left-[18px]' : 'left-0.5'}`} />
               </button>
@@ -305,52 +259,43 @@ export function TodayClient({ targets, recentRecipes }: Props) {
               <button
                 key={s.value}
                 onClick={() => setStore(s.value)}
-                className={`py-3 px-4 rounded-[var(--radius-md)] text-sm font-bold transition-all border-2 ${
-                  store === s.value
-                    ? 'text-white border-transparent shadow-md'
-                    : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-accent-light)]'
+                className={`py-3 px-4 rounded-[var(--radius-lg)] text-sm font-bold transition-all border-2 ${
+                  store === s.value ? 'border-transparent' : 'border-[var(--color-border)]'
                 }`}
-                style={store === s.value ? { backgroundColor: s.color, borderColor: s.color } : {}}
+                style={store === s.value
+                  ? { backgroundColor: s.color, color: s.textColor, borderColor: 'transparent' }
+                  : { backgroundColor: 'var(--color-surface)', color: 'var(--color-muted)' }
+                }
               >
                 {s.label}
               </button>
             ))}
           </div>
-        </Card>
+        </div>
 
-        {/* Filters (collapsible) */}
+        {/* Filters */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-between w-full text-sm font-semibold text-[var(--color-muted)] px-1"
+          className="flex items-center justify-between w-full text-xs font-semibold text-[var(--color-subtle)] uppercase tracking-widest"
         >
           <span>Filters</span>
-          <span className="text-[var(--color-subtle)]">{showFilters ? '▲' : '▼'}</span>
+          <span>{showFilters ? '▲' : '▼'}</span>
         </button>
 
         {showFilters && (
-          <Card padding="md" className="flex flex-col gap-4">
-            {/* Budget */}
-            <Input
-              label="Budget"
-              type="number"
-              inputMode="decimal"
-              unit="CHF"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-              placeholder="10"
-            />
-            {/* Time */}
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4 flex flex-col gap-4">
+            <Input label="Budget" type="number" inputMode="decimal" unit="CHF" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="10" />
             <div>
-              <label className="text-sm font-semibold text-[var(--color-text)] mb-2 block">Prep time</label>
+              <label className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-widest mb-2 block">Prep time</label>
               <div className="flex flex-wrap gap-2">
                 {TIME_FILTERS.map((t) => (
                   <button
                     key={t.value}
                     onClick={() => setTimeFilter(t.value)}
-                    className={`px-3.5 py-2 rounded-full text-sm font-semibold transition-all ${
+                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
                       timeFilter === t.value
-                        ? 'bg-[var(--color-accent)] text-white'
-                        : 'bg-stone-100 text-[var(--color-muted)]'
+                        ? 'bg-[var(--color-lime)] text-[#0e0e0e] border-[var(--color-lime)]'
+                        : 'bg-[var(--color-surface-raised)] text-[var(--color-muted)] border-[var(--color-border)]'
                     }`}
                   >
                     {t.label}
@@ -358,26 +303,25 @@ export function TodayClient({ targets, recentRecipes }: Props) {
                 ))}
               </div>
             </div>
-            {/* Max protein efficiency */}
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-semibold text-[var(--color-text)]">Maximum protein efficiency</div>
-                <div className="text-xs text-[var(--color-subtle)]">Prioritise most protein per calorie</div>
+                <div className="text-sm font-bold text-[var(--color-text)]">Max protein efficiency</div>
+                <div className="text-xs text-[var(--color-subtle)]">Most protein per calorie</div>
               </div>
               <button
                 onClick={() => setMaxProtein(!maxProtein)}
-                className={`w-9 h-5 rounded-full transition-colors ${maxProtein ? 'bg-[var(--color-accent)]' : 'bg-stone-200'} relative flex-shrink-0`}
+                className={`w-9 h-5 rounded-full transition-colors relative flex-shrink-0 ${maxProtein ? 'bg-[var(--color-lime)]' : 'bg-[var(--color-border-strong)]'}`}
               >
                 <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${maxProtein ? 'left-[18px]' : 'left-0.5'}`} />
               </button>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Recent meals */}
         {(recentRecipes as Record<string, unknown>[]).length > 0 && (
           <div>
-            <h2 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wide mb-3 px-1">Your usual options</h2>
+            <p className="text-xs font-semibold text-[var(--color-muted)] uppercase tracking-widest mb-3">Your usual options</p>
             <div className="flex gap-3 overflow-x-auto pb-1 -mx-4 px-4 snap-x snap-mandatory">
               {(recentRecipes as Record<string, unknown>[]).map((r) => (
                 <a
@@ -386,7 +330,7 @@ export function TodayClient({ targets, recentRecipes }: Props) {
                   className="flex-shrink-0 snap-start bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4 w-48 flex flex-col gap-2"
                 >
                   <div className="text-sm font-bold text-[var(--color-text)] line-clamp-2">{String(r.name)}</div>
-                  <div className="text-xs text-[var(--color-accent)] font-semibold">
+                  <div className="text-xs text-[var(--color-lime)] font-bold">
                     {Math.round(Number(r.total_protein))}g protein · {Math.round(Number(r.total_calories))} kcal
                   </div>
                   <div className="text-xs text-[var(--color-subtle)]">{chf(Number(r.estimated_price_chf))}</div>
@@ -401,17 +345,18 @@ export function TodayClient({ targets, recentRecipes }: Props) {
       {/* Sticky CTA */}
       <div className="sticky bottom-[calc(72px+env(safe-area-inset-bottom))] bg-[var(--color-bg)] border-t border-[var(--color-border)] px-4 py-3 z-20">
         <Button
+          variant="lime"
           size="xl"
           fullWidth
           onClick={handleSubmit}
           disabled={!hasInput}
-          className="shadow-lg shadow-[var(--color-accent)]/20"
+          className="shadow-lg shadow-[var(--color-lime)]/20"
         >
           Show me what fits →
         </Button>
         {!hasInput && (
           <p className="text-xs text-center text-[var(--color-subtle)] mt-2">
-            Enter your remaining calories and protein to continue
+            Enter your remaining calories and protein
           </p>
         )}
       </div>
