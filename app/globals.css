@@ -1,26 +1,107 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Base stone palette */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+  --color-stone-950: #0c0a09;
+
+  /* Brand forest green */
+  --color-forest-50: #f0f4ef;
+  --color-forest-100: #d9e7d7;
+  --color-forest-200: #b3ceaf;
+  --color-forest-300: #8db488;
+  --color-forest-400: #679b60;
+  --color-forest-500: #4a7c44;
+  --color-forest-600: #3a6235;
+  --color-forest-700: #2d4d29;
+  --color-forest-800: #21381e;
+  --color-forest-900: #152413;
+
+  /* Positive / progress accents */
+  --color-lime-400: #a3e635;
+  --color-lime-500: #84cc16;
+  --color-lime-600: #65a30d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+
+  /* Semantic app tokens */
+  --color-bg: #f7f6f3;
+  --color-surface: #ffffff;
+  --color-border: #e5e3df;
+  --color-text: #1c1917;
+  --color-muted: #78716c;
+  --color-subtle: #a8a29e;
+  --color-accent: #3a6235;
+  --color-accent-light: #d9e7d7;
+  --color-accent-dark: #2d4d29;
+  --color-positive: #a3e635;
+  --color-warn: #f59e0b;
+  --color-danger: #ef4444;
+
+  /* Store identity */
+  --color-coop: #e31e26;
+  --color-migros: #ff6600;
+  --color-lidl: #0050aa;
+  --color-denner: #cc0000;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  /* Font stack — Geist when available, falls back gracefully */
+  --font-sans: 'Inter', 'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
 }
+
+/* iPhone notch / home indicator safe areas */
+.safe-top    { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Remove number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }
+
+/* Pressed state */
+button:active { transform: scale(0.97); }
+
+/* Store badge utility classes */
+.store-badge-coop   { background: #fff1f1; color: #c01016; border: 1px solid #fecaca; }
+.store-badge-migros { background: #fff4ee; color: #c04300; border: 1px solid #fed7aa; }
+.store-badge-lidl   { background: #eff6ff; color: #1a5fc2; border: 1px solid #bfdbfe; }
+.store-badge-denner { background: #fff1f1; color: #a00000; border: 1px solid #fecaca; }
