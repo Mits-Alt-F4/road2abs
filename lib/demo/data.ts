@@ -4,6 +4,253 @@
  */
 import type { Recipe, NutritionTargets } from '@/types'
 
+// ── DEMO PRODUCTS ─────────────────────────────────────────────────────────────
+// Real products scraped from coop.ch and migros.ch — public data
+
+export interface DemoProduct {
+  id: string
+  name: string
+  brand: string
+  store: 'coop' | 'migros'
+  category: string
+  image_url: string
+  product_page_url: string
+  price_chf: number
+  price_unit: string
+  calories_per_100g: number
+  protein_per_100g: number
+  carbs_per_100g: number
+  fat_per_100g: number
+  package_size: string
+  tags: string[]
+}
+
+export const DEMO_PRODUCTS: DemoProduct[] = [
+  {
+    id: 'dp-1',
+    name: 'Thon rosé naturel',
+    brand: 'Coop',
+    store: 'coop',
+    category: 'Fish',
+    image_url: 'https://www.coop.ch/img/produkte/737_737/RGB/3950233_001.jpg',
+    product_page_url: 'https://www.coop.ch/de/lebensmittel/vorraete/konserven/fisch/thunfisch-ohne-oel/thon-rose-naturel/p/3950233',
+    price_chf: 1.95,
+    price_unit: '155g',
+    calories_per_100g: 110,
+    protein_per_100g: 26,
+    carbs_per_100g: 0,
+    fat_per_100g: 0.7,
+    package_size: '155g drained / 200g net',
+    tags: ['high-protein', 'no-cook', 'cheap', 'emergency-protein'],
+  },
+  {
+    id: 'dp-2',
+    name: 'Naturafarm Pouletbrust',
+    brand: 'Naturafarm',
+    store: 'coop',
+    category: 'Chicken',
+    image_url: 'https://www.coop.ch/img/produkte/737_737/RGB/3066950_001.jpg',
+    product_page_url: 'https://www.coop.ch/de/lebensmittel/fleisch-fisch/abgepacktes-frischfleisch/gefluegel/naturafarm-pouletbrust-2-stueck-ca/p/3066950',
+    price_chf: 12.20,
+    price_unit: 'ca. 220g',
+    calories_per_100g: 109,
+    protein_per_100g: 25,
+    carbs_per_100g: 0,
+    fat_per_100g: 1,
+    package_size: 'ca. 220g (2 pieces)',
+    tags: ['high-protein', 'chicken', 'lean'],
+  },
+  {
+    id: 'dp-3',
+    name: 'Skyr Natur',
+    brand: 'Coop',
+    store: 'coop',
+    category: 'Dairy',
+    image_url: 'https://www.coop.ch/img/produkte/737_737/RGB/6622281_001.jpg',
+    product_page_url: 'https://www.coop.ch/de/lebensmittel/milchprodukte-eier/joghurt/joghurt-nature/skyr-natur/p/6622281',
+    price_chf: 2.95,
+    price_unit: '400g',
+    calories_per_100g: 58,
+    protein_per_100g: 11,
+    carbs_per_100g: 3.5,
+    fat_per_100g: 0,
+    package_size: '400g',
+    tags: ['high-protein', 'skyr', 'snack', 'no-cook'],
+  },
+  {
+    id: 'dp-4',
+    name: 'Prix Garantie Magerquark',
+    brand: 'Prix Garantie',
+    store: 'coop',
+    category: 'Dairy',
+    image_url: 'https://www.coop.ch/img/produkte/737_737/RGB/6568630_001.jpg',
+    product_page_url: 'https://www.coop.ch/de/lebensmittel/milchprodukte-eier/quark/quark-nature/prix-garantie-magerquark/p/6568630',
+    price_chf: 1.25,
+    price_unit: '500g',
+    calories_per_100g: 62,
+    protein_per_100g: 11,
+    carbs_per_100g: 4,
+    fat_per_100g: 0.2,
+    package_size: '500g',
+    tags: ['high-protein', 'quark', 'cheap', 'no-cook'],
+  },
+  {
+    id: 'dp-5',
+    name: 'Optigal Pouletbrust',
+    brand: 'Optigal',
+    store: 'migros',
+    category: 'Chicken',
+    image_url: 'https://image.migros.ch/d/mo-boxed/v-w-1000-h-1000/o-af-1-t.clr-fff/0656119f4441c8e0e766f0a079dd42bdc6cd9084/optigal-pouletbrust.jpg',
+    product_page_url: 'https://www.migros.ch/de/product/231525586000',
+    price_chf: 3.20,
+    price_unit: 'per 100g',
+    calories_per_100g: 92,
+    protein_per_100g: 20,
+    carbs_per_100g: 0.6,
+    fat_per_100g: 1,
+    package_size: 'per 100g (sold loose)',
+    tags: ['high-protein', 'chicken', 'lean'],
+  },
+  {
+    id: 'dp-6',
+    name: 'You Skyr Magerquark Nature',
+    brand: 'You',
+    store: 'migros',
+    category: 'Dairy',
+    image_url: 'https://image.migros.ch/d/mo-boxed/v-w-1000-h-1000/o-af-1-t.clr-fff/eb015519058c0be29288132fb260f267ee6dbcd2/you-skyr-magerquark-nature.jpg',
+    product_page_url: 'https://www.migros.ch/de/product/205223900000',
+    price_chf: 1.80,
+    price_unit: '170g',
+    calories_per_100g: 61,
+    protein_per_100g: 12,
+    carbs_per_100g: 2.9,
+    fat_per_100g: 0.5,
+    package_size: '170g',
+    tags: ['high-protein', 'skyr', 'snack', 'no-cook', 'cheap'],
+  },
+  {
+    id: 'dp-7',
+    name: 'Migros Rosa Thon in Salzwasser',
+    brand: 'Migros',
+    store: 'migros',
+    category: 'Fish',
+    image_url: 'https://image.migros.ch/d/mo-boxed/v-w-1000-h-1000/o-af-1-t.clr-fff/6fd4c0674523286bc06f61c51ac894468889a8b1/migros-rosa-thon-in-salzwasser.jpg',
+    product_page_url: 'https://www.migros.ch/de/product/155133700000',
+    price_chf: 5.40,
+    price_unit: '4×155g',
+    calories_per_100g: 105,
+    protein_per_100g: 25,
+    carbs_per_100g: 0,
+    fat_per_100g: 0.6,
+    package_size: '4×155g multipack',
+    tags: ['high-protein', 'tuna', 'no-cook', 'emergency-protein'],
+  },
+  {
+    id: 'dp-8',
+    name: 'M-Budget Magerquark',
+    brand: 'M-Budget',
+    store: 'migros',
+    category: 'Dairy',
+    image_url: 'https://image.migros.ch/d/mo-boxed/v-w-1000-h-1000/o-af-1-t.clr-fff/172505f62b577283ae4bb49514b0545a565277d1/m-budget-magerquark.jpg',
+    product_page_url: 'https://www.migros.ch/de/product/200803100000',
+    price_chf: 1.25,
+    price_unit: '500g',
+    calories_per_100g: 63,
+    protein_per_100g: 9.7,
+    carbs_per_100g: 5.7,
+    fat_per_100g: 0.5,
+    package_size: '500g',
+    tags: ['protein', 'quark', 'cheap', 'no-cook'],
+  },
+  {
+    id: 'dp-9',
+    name: 'Naturafarm Eier Freilandhaltung',
+    brand: 'Naturafarm',
+    store: 'coop',
+    category: 'Eggs',
+    image_url: 'https://www.coop.ch/img/produkte/737_737/RGB/3407653_001.jpg',
+    product_page_url: 'https://www.coop.ch/de/lebensmittel/milchprodukte-eier/eier/eier-roh/naturafarm-eier-aus-freilandhaltung-53g-10-stueck/p/3407653',
+    price_chf: 6.30,
+    price_unit: '10 Stück',
+    calories_per_100g: 151,
+    protein_per_100g: 13,
+    carbs_per_100g: 0,
+    fat_per_100g: 11,
+    package_size: '10 eggs à 53g',
+    tags: ['eggs', 'protein', 'breakfast'],
+  },
+  {
+    id: 'dp-10',
+    name: 'Pancho Villa Tortillas Weizen',
+    brand: 'Pancho Villa',
+    store: 'migros',
+    category: 'Carbs',
+    image_url: 'https://image.migros.ch/d/mo-boxed/v-w-1000-h-1000/o-af-1-t.clr-fff/2cb1551167f6a82e8f7e681338942eb0997c5811/pancho-villa-tortillas-weizen-super-soft-flexible.jpg',
+    product_page_url: 'https://www.migros.ch/de/product/158567200000',
+    price_chf: 4.55,
+    price_unit: '326g',
+    calories_per_100g: 299,
+    protein_per_100g: 9,
+    carbs_per_100g: 53,
+    fat_per_100g: 5,
+    package_size: '326g (8 wraps)',
+    tags: ['wraps', 'carbs'],
+  },
+  {
+    id: 'dp-11',
+    name: 'Hirz Hüttenkäse Nature',
+    brand: 'Hirz',
+    store: 'coop',
+    category: 'Dairy',
+    image_url: 'https://www.coop.ch/img/produkte/737_737/RGB/3081176_001.jpg',
+    product_page_url: 'https://www.coop.ch/de/lebensmittel/milchprodukte-eier/abgepackter-kaese/frischkaese-mozzarella/huettenkaese/hirz-huettenkaese-nature/p/3081176',
+    price_chf: 1.95,
+    price_unit: '200g',
+    calories_per_100g: 95,
+    protein_per_100g: 10.9,
+    carbs_per_100g: 3.7,
+    fat_per_100g: 4,
+    package_size: '200g',
+    tags: ['cottage-cheese', 'protein', 'snack', 'no-cook'],
+  },
+  {
+    id: 'dp-12',
+    name: 'Migros Cottage Cheese Nature',
+    brand: 'Migros',
+    store: 'migros',
+    category: 'Dairy',
+    image_url: 'https://image.migros.ch/d/mo-boxed/v-w-1000-h-1000/o-af-1-t.clr-fff/51914125b4c156003946f6d244b9305bec08fdb4/migros-cottage-cheese-nature.jpg',
+    product_page_url: 'https://www.migros.ch/de/product/200604100000',
+    price_chf: 1.80,
+    price_unit: '200g',
+    calories_per_100g: 87,
+    protein_per_100g: 10,
+    carbs_per_100g: 2.7,
+    fat_per_100g: 4,
+    package_size: '200g',
+    tags: ['cottage-cheese', 'protein', 'snack', 'no-cook'],
+  },
+]
+
+// ── DEMO SHOPPING LIST ────────────────────────────────────────────────────────
+
+export interface DemoShoppingItem {
+  id: string
+  product: DemoProduct
+  quantity_g: number
+  checked: boolean
+  for_recipe: string
+}
+
+export const DEMO_SHOPPING_LIST: DemoShoppingItem[] = [
+  { id: 'si-1', product: DEMO_PRODUCTS[1], quantity_g: 200, checked: false, for_recipe: 'Chicken Teriyaki Rice Bowl' },
+  { id: 'si-2', product: DEMO_PRODUCTS[2], quantity_g: 150, checked: false, for_recipe: 'Skyr Berry Parfait' },
+  { id: 'si-3', product: DEMO_PRODUCTS[0], quantity_g: 155, checked: true,  for_recipe: 'Tuna Melt on Toast' },
+  { id: 'si-4', product: DEMO_PRODUCTS[8], quantity_g: 106, checked: false, for_recipe: 'Creamy Scrambled Eggs' },
+  { id: 'si-5', product: DEMO_PRODUCTS[9], quantity_g: 80,  checked: false, for_recipe: 'Greek Chicken Wrap' },
+  { id: 'si-6', product: DEMO_PRODUCTS[3], quantity_g: 250, checked: true,  for_recipe: 'Quark Chocolate Mousse' },
+]
+
 export const DEMO_TARGETS: NutritionTargets = {
   calories: 2070,
   protein_min: 130,

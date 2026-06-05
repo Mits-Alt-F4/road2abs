@@ -82,16 +82,35 @@ export default function DemoResultsClient({ results, overBudgetResults, remainin
         )}
 
         {(results.length > 0 || overBudgetResults.length > 0) && (
-          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4 mt-2">
-            <p className="text-sm font-black text-[var(--color-text)] mb-1">Want to use Road2Abs for real?</p>
-            <p className="text-xs text-[var(--color-subtle)] mb-3">Create a free account to save favourites, build shopping lists, track progress, and get recommendations from actual verified Swiss supermarket products.</p>
-            <Link
-              href="/auth/login"
-              className="inline-block w-full text-center bg-[var(--color-lime)] text-[#0e0e0e] font-black text-sm py-3 rounded-[var(--radius-lg)]"
-            >
-              Create free account →
-            </Link>
-          </div>
+          <>
+            {/* Other demo sections */}
+            <div className="flex flex-col gap-2 mt-1">
+              <p className="text-xs font-bold text-[var(--color-muted)] uppercase tracking-widest">Also in the demo</p>
+              {[
+                { href: '/demo/products', label: 'Product Library', desc: 'Real product photos + macros' },
+                { href: '/demo/recipe', label: 'Recipe Detail', desc: 'Steps, ingredients, shopping list' },
+                { href: '/demo/shopping-list', label: 'Shopping List', desc: 'Grouped by store, tap to check off' },
+              ].map(s => (
+                <Link key={s.href} href={s.href}
+                  className="flex items-center justify-between p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)]">
+                  <div>
+                    <div className="text-sm font-bold text-[var(--color-text)]">{s.label}</div>
+                    <div className="text-xs text-[var(--color-subtle)]">{s.desc}</div>
+                  </div>
+                  <span className="text-[var(--color-muted)] ml-3">→</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4">
+              <p className="text-sm font-black text-[var(--color-text)] mb-1">Want this for real?</p>
+              <p className="text-xs text-[var(--color-subtle)] mb-3">Create a free account to get recommendations from verified Swiss supermarket products, save favourites, and build real shopping lists.</p>
+              <Link href="/auth/login"
+                className="inline-block w-full text-center bg-[var(--color-lime)] text-[#0e0e0e] font-black text-sm py-3 rounded-[var(--radius-lg)]">
+                Create free account →
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </div>
