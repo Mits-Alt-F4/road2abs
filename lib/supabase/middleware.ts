@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  const publicPaths = ['/auth/login', '/auth/callback', '/offline']
+  const publicPaths = ['/auth/login', '/auth/callback', '/offline', '/demo']
   const isPublic = publicPaths.some((p) => pathname.startsWith(p))
 
   if (!user && !isPublic) {
