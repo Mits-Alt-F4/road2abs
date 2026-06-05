@@ -1,107 +1,117 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Base palette */
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-300: #d6d3d1;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-600: #57534e;
-  --color-stone-700: #44403c;
-  --color-stone-800: #292524;
-  --color-stone-900: #1c1917;
-  --color-stone-950: #0c0a09;
+  /* ── PALETTE ─────────────────────────────────────────────────────────────── */
 
-  /* Brand forest green */
-  --color-forest-50: #f0f4ef;
-  --color-forest-100: #d9e7d7;
-  --color-forest-200: #b3ceaf;
-  --color-forest-300: #8db488;
-  --color-forest-400: #679b60;
-  --color-forest-500: #4a7c44;
-  --color-forest-600: #3a6235;
-  --color-forest-700: #2d4d29;
-  --color-forest-800: #21381e;
-  --color-forest-900: #152413;
+  /* Semantic tokens — the only colours used in components */
+  --color-bg:             #0D0F0E;   /* near-black charcoal */
+  --color-surface:        #161A17;   /* card backgrounds */
+  --color-surface-raised: #1D221E;   /* elevated cards, inputs */
+  --color-border:         #252C27;   /* subtle dividers */
+  --color-border-strong:  #323C34;   /* visible borders */
 
-  /* Lime — from R2A road logo */
-  --color-lime-300: #d9f066;
-  --color-lime-400: #c5d94a;
-  --color-lime-500: #a8be30;
-  --color-lime-600: #8aa020;
+  --color-text:    #F3F1E8;   /* primary text — warm off-white */
+  --color-muted:   #A7ADA4;   /* secondary text */
+  --color-subtle:  #5A6057;   /* placeholder / disabled */
 
-  --color-amber-400: #fbbf24;
-  --color-amber-500: #f59e0b;
+  --color-accent:       #6D8F58;   /* muted green — secondary actions */
+  --color-accent-light: #182018;   /* green tinted background */
+  --color-accent-dark:  #89B06E;   /* green on dark bg */
 
-  /* Semantic dark tokens */
-  --color-bg: #0e0e0e;
-  --color-surface: #171717;
-  --color-surface-raised: #202020;
-  --color-border: #272727;
-  --color-border-strong: #353535;
-  --color-text: #edece8;
-  --color-muted: #7a7875;
-  --color-subtle: #474441;
-  --color-accent: #3a6235;
-  --color-accent-light: #1c2e1a;
-  --color-accent-dark: #4d8046;
-  --color-lime: #c5d94a;
-  --color-positive: #c5d94a;
-  --color-warn: #f59e0b;
-  --color-danger: #ef4444;
+  --color-lime:    #B6E36B;   /* primary positive / CTA */
+  --color-lime-dim:#2A3D1A;   /* lime background tint */
+
+  --color-warn:    #E0A458;   /* over budget / warning */
+  --color-danger:  #D96C6C;   /* error */
 
   /* Store identity */
-  --color-coop: #e31e26;
-  --color-migros: #ff6600;
-  --color-lidl: #0050aa;
-  --color-denner: #cc0000;
+  --color-coop:   #E31E26;
+  --color-migros: #FF6600;
+  --color-lidl:   #0050AA;
+  --color-denner: #CC0000;
 
-  /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  /* Spacing & shape */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  18px;
   --radius-2xl: 24px;
 
+  /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, monospace;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
+/* ── RESET ──────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
-  background-color: var(--color-bg);
+  background: var(--color-bg);
   color: var(--color-text);
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--color-bg);
+  background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   min-height: 100dvh;
   overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-.safe-top    { padding-top: env(safe-area-inset-top); }
+/* ── SAFE AREAS ─────────────────────────────────────────────────────────────── */
+
+.safe-top    { padding-top:    env(safe-area-inset-top); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
+/* ── INPUTS ─────────────────────────────────────────────────────────────────── */
+
 input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 input[type="number"] { -moz-appearance: textfield; }
+
+input::placeholder { color: var(--color-subtle); }
+
+/* ── INTERACTION ────────────────────────────────────────────────────────────── */
 
 button:active { transform: scale(0.97); }
 
-.store-badge-coop   { background: #2a0a0a; color: #f87171; border: 1px solid #7f1d1d; }
-.store-badge-migros { background: #2a1200; color: #fb923c; border: 1px solid #7c2d12; }
-.store-badge-lidl   { background: #0a1a2a; color: #60a5fa; border: 1px solid #1e3a5f; }
-.store-badge-denner { background: #2a0000; color: #f87171; border: 1px solid #7f1d1d; }
+/* ── STORE BADGES ───────────────────────────────────────────────────────────── */
+
+.store-badge-coop   { background: #230808; color: #F07070; border: 1px solid #5C1515; }
+.store-badge-migros { background: #221000; color: #F09050; border: 1px solid #5C2D10; }
+.store-badge-lidl   { background: #081520; color: #5090D0; border: 1px solid #103050; }
+.store-badge-denner { background: #200808; color: #E06060; border: 1px solid #5C1010; }
+
+/* ── CARD BASE ──────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+}
+
+/* ── MACRO PILL ─────────────────────────────────────────────────────────────── */
+
+.macro-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.macro-pill-protein { background: var(--color-lime-dim); color: var(--color-lime); }
+.macro-pill-cal     { background: var(--color-surface-raised); color: var(--color-muted); }
+.macro-pill-carbs   { background: var(--color-surface-raised); color: var(--color-muted); }
+.macro-pill-fat     { background: var(--color-surface-raised); color: var(--color-subtle); }
+
+/* ── SCROLLBAR ──────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 0; height: 0; }
