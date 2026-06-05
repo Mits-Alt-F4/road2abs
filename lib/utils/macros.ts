@@ -1,5 +1,38 @@
 import type { NutritionTargets, MacroInput, RecommendationResult, Recipe } from '@/types'
 
+export function calorieBand(calLeft: number): 'emergency' | 'light' | 'medium' | 'large' {
+  if (calLeft < 300) return 'emergency'
+  if (calLeft < 600) return 'light'
+  if (calLeft < 900) return 'medium'
+  return 'large'
+}
+
+export function recipeMatchesBand(recipe: Recipe, band: ReturnType<typeof calorieBand>): boolean {
+  const cal = recipe.total_calories
+  const contexts: string[] = recipe.suitable_contexts ?? []
+  const isSnack = contexts.some((c: string) => ['snack', 'emergency_protein', 'no_cooking', 'sweet'].includes(c))
+  if (band === 'emergency') return cal <= 350 || isSnack
+  if (band === 'light') return cal <= 680
+  if (band === 'medium') return cal <= 980
+  return true
+}
+
+export function whyItFits(recipe: Recipe, remaining: MacroInput, budget: number, reaches_protein_target: boolean, fits_calories: boolean): string {
+  const cal = remaining.calories ?? 0
+  const pro = remaining.protein ?? 0
+  const parts: string[] = []
+  if (reaches_protein_target) parts.push(`Hits your ${Math.round(pro)}g protein target`)
+  else parts.push(`Gives ${recipe.total_protein}g of ${Math.round(pro)}g protein needed`)
+  if (fits_calories) {
+    const leftover = cal - recipe.total_calories
+    parts.push(leftover < 80 ? `uses almost all your ${Math.round(cal)} kcal` : `fits in ${Math.round(cal)} kcal (${Math.round(leftover)} spare)`)
+  } else {
+    parts.push(`${Math.round(recipe.total_calories - cal)} kcal over — shown anyway`)
+  }
+  if (recipe.estimated_price_chf <= budget) parts.push(`within CHF ${budget.toFixed(0)} budget`)
+  return parts.join(' · ')
+}
+
 export function calcRemaining(targets: NutritionTargets, consumed: MacroInput): MacroInput {
   return {
     calories: targets.calories - (consumed.calories ?? 0),
@@ -62,12 +95,20 @@ export function scoreRecipe(
   if (reaches_protein_min) badges.push('Reaches protein minimum')
 
   let score = 0
-  if (fits_calories) score += 40
-  score += Math.min(30, (recipe.total_protein / Math.max(pro, 1)) * 30)
+  if (fits_calories) {
+    score += 50
+    const utilisation = recipe.total_calories / Math.max(cal, 1)
+    if (utilisation >= 0.6 && utilisation <= 1.0) score += 20 * utilisation
+  } else {
+    const overflowRatio = (recipe.total_calories - cal) / Math.max(cal, 1)
+    score -= overflowRatio * 60
+  }
+  score += Math.min(35, (recipe.total_protein / Math.max(pro, 1)) * 35)
   if (!over_budget) score += 10
   if (isFavourite) score += 8
   if (maxProteinEfficiency) score += efficiency * 2
-  score -= Math.max(0, calories_remaining_after < 0 ? -calories_remaining_after / 10 : 0)
+
+  const why = whyItFits(recipe, remaining, budget, reaches_protein_target, fits_calories)
 
   return {
     recipe,
@@ -82,6 +123,7 @@ export function scoreRecipe(
     budget_diff_chf,
     badges,
     score,
+    why,
   }
 }
 

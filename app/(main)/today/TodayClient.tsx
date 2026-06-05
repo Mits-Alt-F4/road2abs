@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import { StoreLogoByName } from '@/components/ui/StoreLogo'
 import { formatDate, greeting, chf } from '@/lib/utils/format'
 import type { NutritionTargets, MealContext, MealTime, Store, TimeFilter } from '@/types'
 
@@ -259,15 +260,19 @@ export function TodayClient({ targets, recentRecipes }: Props) {
               <button
                 key={s.value}
                 onClick={() => setStore(s.value)}
-                className={`py-3 px-4 rounded-[var(--radius-lg)] text-sm font-bold transition-all border-2 ${
-                  store === s.value ? 'border-transparent' : 'border-[var(--color-border)]'
+                className={`flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[var(--radius-xl)] transition-all border-2 ${
+                  store === s.value
+                    ? 'border-[var(--color-lime)] bg-[var(--color-surface-raised)]'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)]'
                 }`}
-                style={store === s.value
-                  ? { backgroundColor: s.color, color: s.textColor, borderColor: 'transparent' }
-                  : { backgroundColor: 'var(--color-surface)', color: 'var(--color-muted)' }
-                }
               >
-                {s.label}
+                {s.value === 'any_nearby'
+                  ? <span className="text-xl">📍</span>
+                  : <StoreLogoByName store={s.value} size={28} />
+                }
+                <span className={`text-xs font-bold ${store === s.value ? 'text-[var(--color-lime)]' : 'text-[var(--color-muted)]'}`}>
+                  {s.label}
+                </span>
               </button>
             ))}
           </div>

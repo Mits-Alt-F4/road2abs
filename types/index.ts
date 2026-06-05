@@ -42,6 +42,8 @@ export interface Product {
   store: Store
   category: string
   image_url: string | null
+  official_image_url: string | null
+  uploaded_image_url: string | null
   product_page_url: string | null
   price_chf: number
   price_unit: string
@@ -57,6 +59,7 @@ export interface Product {
   availability_notes: string | null
   last_checked: string | null
   verified: boolean
+  source_notes: string | null
   tags: string[]
   active: boolean
   created_at: string
@@ -186,6 +189,7 @@ export interface RecommendationResult {
   budget_diff_chf: number
   badges: string[]
   score: number
+  why: string
 }
 
 export interface HomepageFormState {

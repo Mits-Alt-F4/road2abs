@@ -7,6 +7,7 @@ const ITEMS = [
   { href: '/more/pantry', emoji: '🧺', title: 'My pantry', desc: 'Mark what you already have at home' },
   { href: '/more/progress', emoji: '📈', title: 'Progress', desc: 'Weekly weight and energy check-ins' },
   { href: '/more/settings', emoji: '⚙️', title: 'Settings', desc: 'Targets, stores, equipment and preferences' },
+  { href: '/products', emoji: '🛒', title: 'Product Library', desc: 'Verified products with photos and macros' },
 ]
 
 export default function MorePage() {

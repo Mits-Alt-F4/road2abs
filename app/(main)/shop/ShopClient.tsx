@@ -4,13 +4,14 @@ import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import { StoreLogoByName } from '@/components/ui/StoreLogo'
 import type { NutritionTargets, Store } from '@/types'
 
-const STORES: { value: Store; label: string; emoji: string; color: string }[] = [
-  { value: 'coop', label: 'Coop', emoji: '🟥', color: '#e31e26' },
-  { value: 'migros', label: 'Migros', emoji: '🟧', color: '#ff6600' },
-  { value: 'lidl', label: 'Lidl', emoji: '🔵', color: '#0050aa' },
-  { value: 'denner', label: 'Denner', emoji: '🟥', color: '#cc0000' },
+const STORES: { value: Store; label: string }[] = [
+  { value: 'coop', label: 'Coop' },
+  { value: 'migros', label: 'Migros' },
+  { value: 'lidl', label: 'Lidl' },
+  { value: 'denner', label: 'Denner' },
 ]
 
 const DEFAULT_TARGETS = { calories: 2070, protein_min: 130, protein_target: 160, protein_max: 180 }
@@ -47,21 +48,24 @@ export function ShopClient({ targets }: { targets: NutritionTargets | null }) {
 
       <div className="px-4 py-4 flex flex-col gap-4">
 
-        {/* Store selector — big tap targets */}
+        {/* Store selector — big tap targets with real logos */}
         <div className="grid grid-cols-2 gap-3">
           {STORES.map((s) => (
             <button
               key={s.value}
               onClick={() => setStore(store === s.value ? null : s.value)}
-              className={`flex flex-col items-center justify-center py-5 rounded-[var(--radius-xl)] border-2 font-bold text-lg transition-all active:scale-[0.97] ${
+              className={`flex flex-col items-center justify-center py-5 rounded-[var(--radius-xl)] border-2 transition-all active:scale-[0.97] ${
                 store === s.value
-                  ? 'text-white border-transparent shadow-lg'
-                  : 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)]'
+                  ? 'border-[var(--color-lime)] bg-[var(--color-surface-raised)]'
+                  : 'bg-[var(--color-surface)] border-[var(--color-border)]'
               }`}
-              style={store === s.value ? { backgroundColor: s.color, borderColor: s.color } : {}}
             >
-              <span className="text-3xl mb-1">{s.emoji}</span>
-              {s.label}
+              <div className="mb-2">
+                <StoreLogoByName store={s.value} size={36} />
+              </div>
+              <span className={`text-sm font-bold ${store === s.value ? 'text-[var(--color-lime)]' : 'text-[var(--color-muted)]'}`}>
+                {s.label}
+              </span>
             </button>
           ))}
         </div>

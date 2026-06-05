@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { ResultsClient } from './ResultsClient'
-import { scoreRecipe } from '@/lib/utils/macros'
+import { scoreRecipe, calorieBand, recipeMatchesBand } from '@/lib/utils/macros'
 import type { MacroInput, NutritionTargets, Store } from '@/types'
 
 const DEFAULT_TARGETS: NutritionTargets = {
@@ -39,25 +39,17 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
 
   const nutritionTargets = targets ?? DEFAULT_TARGETS
 
-  // Build store filter
-  const allowedStores: Store[] = nearbyOnly
-    ? ['coop', 'migros']
-    : ['coop', 'migros', 'lidl', 'denner']
+  // Calorie band — drives what recipe sizes are shown
+  const band = calorieBand(remaining.calories ?? 0)
 
-  if (storeParam !== 'any_nearby' && storeParam !== 'any') {
-    const specific = storeParam as Store
-    if (allowedStores.includes(specific)) {
-      // Will filter in scoring
-    }
-  }
-
-  // Fetch recipes matching situation
+  // Build recipe query — DO NOT filter by suitable_contexts in DB (it breaks for 'meal')
+  // Instead filter in JS for flexibility
   let query = supabase
     .from('recipes')
     .select('*, recipe_ingredients(*, products(*))')
     .eq('active', true)
-    .contains('suitable_contexts', situation !== 'meal' ? [situation] : [])
 
+  // Time filter in DB (these are hard constraints)
   if (timeFilter === 'none') {
     query = query.eq('total_time_min', 0)
   } else if (timeFilter === 'under_10') {
@@ -66,7 +58,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
     query = query.lte('total_time_min', 20)
   }
 
-  const { data: allRecipes } = await query.limit(50)
+  const { data: allRecipes } = await query.limit(80)
 
   const { data: favourites } = await supabase
     .from('favourites')
@@ -75,29 +67,57 @@ export default async function ResultsPage({ searchParams }: { searchParams: Prom
 
   const favSet = new Set((favourites ?? []).map((f) => f.recipe_id))
 
-  const recipes = (allRecipes ?? []).filter((r) => {
+  // JS filtering — more flexible than DB contains()
+  const filtered = (allRecipes ?? []).filter((r) => {
+    const contexts: string[] = r.suitable_contexts ?? []
+
+    // Situation filter
+    if (situation === 'emergency_protein') {
+      if (!contexts.includes('emergency_protein') && !contexts.includes('snack')) return false
+    } else if (situation === 'snack') {
+      if (!contexts.includes('snack') && !contexts.includes('sweet') && !contexts.includes('no_cooking')) return false
+    } else if (situation === 'sweet') {
+      if (!contexts.includes('sweet') && !contexts.includes('snack')) return false
+    } else if (situation === 'no_cooking') {
+      if (r.total_time_min > 0 && !contexts.includes('no_cooking')) return false
+    } else if (situation === 'meal_prep') {
+      if (!contexts.includes('meal_prep')) return false
+    }
+    // 'meal' — show all meal and snack results (no filter here)
+
+    // Store filter
+    const recipeStores: string[] = r.stores_required ?? []
     if (storeParam !== 'any_nearby' && storeParam !== 'any') {
-      return r.stores_required?.includes(storeParam)
+      if (!recipeStores.includes(storeParam)) return false
+    } else if (nearbyOnly) {
+      if (!recipeStores.some((s: string) => ['coop', 'migros'].includes(s))) return false
     }
-    if (nearbyOnly) {
-      return r.stores_required?.some((s: string) => ['coop', 'migros'].includes(s))
-    }
+
+    // Calorie band filter — ensures 300 kcal input gives different results than 2000 kcal
+    if (!recipeMatchesBand(r, band)) return false
+
     return true
   })
 
-  const scored = recipes
+  // Score all filtered recipes
+  const scored = filtered
     .map((r) => scoreRecipe(r, remaining, budget, nutritionTargets, favSet.has(r.id), maxProtein))
     .sort((a, b) => b.score - a.score)
-    .slice(0, 15)
+
+  // Split into fits vs slightly over (for UI)
+  const fits = scored.filter((r) => r.fits_calories).slice(0, 12)
+  const slightlyOver = scored.filter((r) => !r.fits_calories).slice(0, 4)
 
   return (
     <ResultsClient
-      results={scored}
+      results={fits}
+      overBudgetResults={slightlyOver}
       remaining={remaining}
       targets={nutritionTargets}
       budget={budget}
       favouriteIds={[...favSet]}
       userId={user.id}
+      calorieBand={band}
     />
   )
 }
