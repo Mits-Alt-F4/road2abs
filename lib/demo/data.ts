@@ -420,6 +420,41 @@ export const DEMO_SHOPPING_LIST: DemoShoppingItem[] = [
   { id: 'si-8', product: DEMO_PRODUCT_MAP['dp-4'],  quantity_g: 250, checked: false, for_recipe: 'Quark Choc Mousse' },
 ]
 
+// ── RECIPE → PRODUCT THUMBNAIL MAP ──────────────────────────────────────────
+// Maps demo recipe IDs to the product IDs shown as thumbnails on recipe cards
+export const RECIPE_PRODUCT_MAP: Record<string, string[]> = {
+  'demo-1':  ['dp-1', 'dp-3'],    // Emergency: tuna + skyr
+  'demo-2':  ['dp-4'],            // Quark mousse: quark
+  'demo-3':  ['dp-3'],            // Skyr parfait: skyr
+  'demo-4':  ['dp-1', 'dp-17'],  // Tuna melt: tuna + toast
+  'demo-5':  ['dp-9'],            // Scrambled eggs: coop eggs
+  'demo-6':  ['dp-3', 'dp-9'],   // Protein pancakes: skyr + eggs
+  'demo-7':  ['dp-2', 'dp-10'],  // Greek wrap: chicken + tortilla
+  'demo-8':  ['dp-2', 'dp-13'],  // Teriyaki: chicken + rice
+  'demo-9':  ['dp-5', 'dp-14'],  // Fried rice: migros chicken + migros rice
+  'demo-10': ['dp-2', 'dp-15'],  // Garlic pasta: chicken + pasta
+  'demo-11': ['dp-16', 'dp-4'],  // Bolognese: pasta + placeholder
+  'demo-12': ['dp-2', 'dp-13'],  // Meal prep: chicken + rice
+}
+
+// ── DATA VALIDATION HELPERS ──────────────────────────────────────────────────
+
+export function isValidProduct(p: DemoProduct | undefined): boolean {
+  if (!p) return false
+  if (!p.price_chf || isNaN(p.price_chf) || p.price_chf <= 0) return false
+  if (!p.calories_per_100g || isNaN(p.calories_per_100g)) return false
+  if (p.protein_per_100g === undefined || isNaN(p.protein_per_100g)) return false
+  return true
+}
+
+export function isValidRecipe(r: import('@/types').Recipe): boolean {
+  if (!r.total_calories || isNaN(r.total_calories)) return false
+  if (!r.total_protein || isNaN(r.total_protein)) return false
+  if (!r.estimated_price_chf || isNaN(r.estimated_price_chf) || r.estimated_price_chf <= 0) return false
+  if (r.estimated_price_chf > 25) return false  // Absurd price guard
+  return true
+}
+
 export const DEMO_TARGETS: NutritionTargets = {
   calories: 2070,
   protein_min: 130,

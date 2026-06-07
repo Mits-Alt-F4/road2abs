@@ -1,7 +1,9 @@
 'use client'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { StoreBadge } from '@/components/ui/Badge'
+import { AppShell } from '@/components/v2/AppShell'
+import { RecipeCard } from '@/components/v2/RecipeCard'
 import { chf } from '@/lib/utils/format'
 import type { MacroInput, RecommendationResult } from '@/types'
 
@@ -13,179 +15,130 @@ interface Props {
   calorieBand: string
 }
 
-const bandLabel: Record<string, { text: string; color: string }> = {
-  emergency: { text: 'Under 300 kcal — snacks & emergency protein only', color: 'text-[var(--color-warn)]' },
-  light:     { text: '300–600 kcal — light meals and snacks', color: 'text-[var(--color-lime)]' },
-  medium:    { text: '600–900 kcal — normal meals', color: 'text-[var(--color-lime)]' },
-  large:     { text: '900+ kcal — full meals shown', color: 'text-[var(--color-lime)]' },
+const bandLabel: Record<string, string> = {
+  emergency: 'Under 300 kcal — snacks & emergency protein',
+  light:     '300–600 kcal — light meals & snacks',
+  medium:    '600–900 kcal — normal meals',
+  large:     '900+ kcal — full meals',
 }
 
 export default function DemoResultsClient({ results, overBudgetResults, remaining, budget, calorieBand }: Props) {
   const router = useRouter()
-  const band = bandLabel[calorieBand] ?? { text: '', color: '' }
+  const [saved, setSaved] = useState(new Set<string>())
+  const [listed, setListed] = useState(new Set<string>())
+
+  function toggleSave(id: string) {
+    setSaved(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+  }
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[var(--color-bg)]">
-
+    <AppShell>
       {/* Demo banner */}
-      <div className="bg-[#1e2800] border-b border-[var(--color-lime)]/30 px-4 py-2 text-center">
-        <p className="text-xs font-bold text-[var(--color-lime)]">
-          Demo mode — sample data only ·{' '}
-          <Link href="/demo/today" className="underline">← Back to form</Link>
+      <div className="bg-[#0f1a0a] border-b border-[var(--color-lime)]/10 px-4 py-2 text-center">
+        <p className="text-[10px] font-bold text-[var(--color-lime)]/60 uppercase tracking-widest">
+          Demo ·{' '}
+          <Link href="/demo/today" className="underline text-[var(--color-lime)]/80">← Back</Link>
+          {' · '}
+          <Link href="/demo/products" className="underline text-[var(--color-lime)]/80">Products</Link>
+          {' · '}
+          <Link href="/demo/shopping-list" className="underline text-[var(--color-lime)]/80">List</Link>
         </p>
       </div>
 
-      {/* Header */}
       <header className="sticky top-0 z-30 bg-[var(--color-bg)] border-b border-[var(--color-border)] px-4 py-3 flex items-center gap-3">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)] font-bold text-sm">←</button>
+        <button onClick={() => router.back()}
+          className="w-9 h-9 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)] font-bold text-sm flex-shrink-0">
+          ←
+        </button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-black text-[var(--color-text)]">
-            {results.length > 0 ? `${results.length} option${results.length !== 1 ? 's' : ''} found` : 'No matches'}
+          <h1 className="text-[15px] font-black text-[var(--color-text)]">
+            {results.length > 0 ? `${results.length} option${results.length !== 1 ? 's' : ''}` : 'No matches'}
           </h1>
-          <p className="text-xs text-[var(--color-subtle)] truncate">
+          <p className="text-[11px] text-[var(--color-subtle)] truncate">
             {Math.round(remaining.calories ?? 0)} kcal · {Math.round(remaining.protein ?? 0)}g protein · {chf(budget)}
           </p>
         </div>
       </header>
 
-      {/* Band label */}
-      <div className="px-4 pt-3">
-        <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)] px-3 py-2 flex items-center justify-between gap-2">
-          <p className={`text-xs font-bold ${band.color}`}>{band.text}</p>
-          <Link
-            href="/demo/today"
-            className="text-[10px] font-semibold text-[var(--color-muted)] underline whitespace-nowrap flex-shrink-0"
-          >
-            Try 300 kcal ↔ 2000 kcal
-          </Link>
-        </div>
-      </div>
+      <div className="px-4 py-3 flex flex-col gap-3 pb-12">
 
-      <div className="px-4 py-4 flex flex-col gap-3">
-        {results.length === 0 && overBudgetResults.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-            <h2 className="text-xl font-black text-[var(--color-text)]">Nothing matched</h2>
-            <p className="text-sm text-[var(--color-subtle)] max-w-xs">Try adjusting your filters or going back to try a different calorie amount.</p>
-            <Link href="/demo/today" className="text-sm font-bold text-[var(--color-lime)] underline">← Back</Link>
+        {/* Band context */}
+        {calorieBand && bandLabel[calorieBand] && (
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold text-[var(--color-muted)] uppercase tracking-widest">
+              {bandLabel[calorieBand]}
+            </p>
+            <Link href="/demo/today" className="text-[10px] text-[var(--color-subtle)] underline">
+              Change inputs
+            </Link>
           </div>
         )}
 
-        {results.map((r) => <DemoRecipeCard key={r.recipe.id} r={r} />)}
+        {results.length === 0 && overBudgetResults.length === 0 && (
+          <div className="py-16 text-center">
+            <p className="text-base font-black text-[var(--color-text)] mb-2">Nothing matched</p>
+            <p className="text-sm text-[var(--color-subtle)] mb-4">Try adjusting your filters or entering different values.</p>
+            <Link href="/demo/today"
+              className="inline-block bg-[var(--color-lime)] text-[#0D0F0E] font-black text-sm px-5 py-2.5 rounded-[var(--radius-lg)]">
+              ← Back
+            </Link>
+          </div>
+        )}
+
+        {results.map(r => (
+          <RecipeCard key={r.recipe.id} r={r}
+            href="/demo/recipe"
+            saved={saved.has(r.recipe.id)}
+            listed={listed.has(r.recipe.id)}
+            onSave={toggleSave}
+            onList={id => setListed(prev => new Set([...prev, id]))}
+          />
+        ))}
 
         {overBudgetResults.length > 0 && (
           <>
-            <div className="pt-2 pb-1">
-              <p className="text-xs font-bold text-[var(--color-muted)] uppercase tracking-widest">Slightly over your calories</p>
-            </div>
-            {overBudgetResults.map((r) => <DemoRecipeCard key={r.recipe.id} r={r} dimmed />)}
+            <p className="text-[10px] font-bold text-[var(--color-subtle)] uppercase tracking-widest pt-1">
+              Too big for today
+            </p>
+            {overBudgetResults.map(r => (
+              <RecipeCard key={r.recipe.id} r={r} href="/demo/recipe" dimmed />
+            ))}
           </>
         )}
 
-        {(results.length > 0 || overBudgetResults.length > 0) && (
+        {results.length > 0 && (
           <>
-            {/* Other demo sections */}
-            <div className="flex flex-col gap-2 mt-1">
-              <p className="text-xs font-bold text-[var(--color-muted)] uppercase tracking-widest">Also in the demo</p>
+            {/* Cross-links */}
+            <div className="flex flex-col gap-2 pt-2">
               {[
-                { href: '/demo/products', label: 'Product Library', desc: 'Real product photos + macros' },
-                { href: '/demo/recipe', label: 'Recipe Detail', desc: 'Steps, ingredients, shopping list' },
-                { href: '/demo/shopping-list', label: 'Shopping List', desc: 'Grouped by store, tap to check off' },
+                { href: '/demo/products', label: 'Product Library', sub: 'Verified Swiss supermarket products' },
+                { href: '/demo/recipe',   label: 'Recipe Detail',   sub: 'Steps, ingredients & shopping list' },
+                { href: '/demo/shopping-list', label: 'Shopping List', sub: 'Grouped by store, tap to check off' },
               ].map(s => (
                 <Link key={s.href} href={s.href}
                   className="flex items-center justify-between p-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-lg)]">
                   <div>
-                    <div className="text-sm font-bold text-[var(--color-text)]">{s.label}</div>
-                    <div className="text-xs text-[var(--color-subtle)]">{s.desc}</div>
+                    <p className="text-sm font-bold text-[var(--color-text)]">{s.label}</p>
+                    <p className="text-[11px] text-[var(--color-subtle)]">{s.sub}</p>
                   </div>
-                  <span className="text-[var(--color-muted)] ml-3">→</span>
+                  <span className="text-[var(--color-subtle)] ml-3 flex-shrink-0">→</span>
                 </Link>
               ))}
             </div>
 
             <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] p-4">
-              <p className="text-sm font-black text-[var(--color-text)] mb-1">Want this for real?</p>
-              <p className="text-xs text-[var(--color-subtle)] mb-3">Create a free account to get recommendations from verified Swiss supermarket products, save favourites, and build real shopping lists.</p>
-              <Link href="/auth/login"
-                className="inline-block w-full text-center bg-[var(--color-lime)] text-[#0e0e0e] font-black text-sm py-3 rounded-[var(--radius-lg)]">
+              <p className="text-sm font-black text-[var(--color-text)] mb-1">Use this for real</p>
+              <p className="text-[11px] text-[var(--color-subtle)] mb-3 leading-relaxed">
+                Connect your actual macros, save favourites, and get recommendations from verified Swiss products.
+              </p>
+              <a href="/auth/login"
+                className="block text-center bg-[var(--color-lime)] text-[#0D0F0E] font-black text-sm py-2.5 rounded-[var(--radius-lg)]">
                 Create free account →
-              </Link>
+              </a>
             </div>
           </>
         )}
       </div>
-    </div>
-  )
-}
-
-function DemoRecipeCard({ r, dimmed = false }: { r: RecommendationResult; dimmed?: boolean }) {
-  return (
-    <div className={`bg-[var(--color-surface)] border border-[var(--color-border)] rounded-[var(--radius-xl)] overflow-hidden ${dimmed ? 'opacity-70' : ''}`}>
-      {/* Protein indicator bar */}
-      <div className="h-1" style={{
-        background: r.reaches_protein_target
-          ? 'var(--color-lime)'
-          : r.reaches_protein_min
-          ? 'var(--color-accent)'
-          : 'var(--color-border-strong)',
-      }} />
-
-      <div className="p-4 flex flex-col gap-3">
-        {/* Title + price */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-black text-[var(--color-text)] text-base leading-tight mb-1.5">{r.recipe.name}</h3>
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {r.recipe.stores_required?.map((s: string) => <StoreBadge key={s} store={s} />)}
-              <span className="text-[11px] text-[var(--color-subtle)] font-medium">
-                {r.recipe.total_time_min > 0 ? `${r.recipe.total_time_min} min` : 'No cooking'}
-              </span>
-            </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className={`text-base font-black ${r.over_budget ? 'text-[var(--color-warn)]' : 'text-[var(--color-text)]'}`}>
-              {chf(r.price_chf)}
-            </div>
-          </div>
-        </div>
-
-        {/* Macro pills */}
-        <div className="flex flex-wrap gap-2">
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text)]">
-            {Math.round(r.recipe.total_calories)} kcal
-          </span>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#1e2800] text-[var(--color-lime)]">
-            {Math.round(r.recipe.total_protein)}g protein
-          </span>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-muted)]">
-            {Math.round(r.recipe.total_carbs)}g carbs
-          </span>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-muted)]">
-            {Math.round(r.recipe.total_fat)}g fat
-          </span>
-        </div>
-
-        {/* Why it fits */}
-        <div className="bg-[var(--color-surface-raised)] rounded-[var(--radius-md)] px-3 py-2.5">
-          <p className="text-xs font-semibold text-[var(--color-text)] leading-relaxed">{r.why}</p>
-          <p className="text-[10px] text-[var(--color-subtle)] mt-1">
-            {r.protein_efficiency}g protein per 100 kcal
-          </p>
-        </div>
-
-        {/* Description */}
-        {r.recipe.description && (
-          <p className="text-xs text-[var(--color-muted)] leading-relaxed">{r.recipe.description}</p>
-        )}
-
-        {/* Badges */}
-        {r.badges.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {r.badges.slice(0, 3).map((b) => (
-              <span key={b} className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#1e2800] text-[var(--color-lime)]">{b}</span>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+    </AppShell>
   )
 }
